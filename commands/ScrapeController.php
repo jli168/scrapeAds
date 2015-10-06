@@ -44,13 +44,43 @@ class ScrapeController extends Controller
 		// Get the latest post in this category and display the titles
 		$crawler->filter('.hdrlnk')->each(function ($node, $i) use (&$count) {
 		    print $node->text(). "--- $i". "\n";
-		    $count++;
+		    $count++;	
 		});
 
 		print "total count is ".$count ."\n";
     }
 
+    /**
+     * open post links and fetch post data
+     * @return [type] [description]
+     */
+    public function actionTrypostlink() {
+        $client = new Client();
 
+        // step1: go to home page
+        $crawler = $client->request('GET', 'http://newyork.craigslist.org/');
+
+        // step2: click "software" link
+        $link = $crawler->selectLink('software')->link();
+        $crawler = $client->click($link);   
+        
+        //step3: for each job post link, click and fetch html data
+        $count = 0;
+        $crawler->filter('.hdrlnk')->each( function ($node, $i) use ( & $count, $client )  {
+            //try 3 posts so far
+            if($count > 2) return;
+
+            $count++;
+            //fetch post link
+            $link = $node->link(); 
+            //click the link, get content
+            $subCrawler = $client->click($link);
+            //print out ;)
+            print $node->text(). "\n";
+            print $subCrawler->filter("#postingbody")->html();   
+            print "\n-------------===============------------------\n";
+        });
+    }
 
 
 }
