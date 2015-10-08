@@ -11,6 +11,8 @@ use yii\console\Controller;
 
 use Goutte\Client;
 
+use app\models\scrape\BaseModel;
+
 
 /**
  * This command echoes the first argument that you have entered.
@@ -31,56 +33,19 @@ class ScrapeController extends Controller
         echo $message . " the world \n";
     }
 
-    /**
-     * try out craigslist and find all titles in software category.
-     * @return [type] [description]
-     */
-    public function actionTry(){
-		$client = new Client();
-    	$crawler = $client->request('GET', 'http://newyork.craigslist.org/');
-    	$link = $crawler->selectLink('software')->link();
-		$crawler = $client->click($link);	
-		$count = 0;
-		// Get the latest post in this category and display the titles
-		$crawler->filter('.hdrlnk')->each(function ($node, $i) use (&$count) {
-		    print $node->text(). "--- $i". "\n";
-		    $count++;	
-		});
+    public function actionTrymodel() {
+        $baseUrl = 'http://newyork.craigslist.org/';
 
-		print "total count is ".$count ."\n";
+        $scrapeModel = new BaseModel( $baseUrl );
+
+        $crawler = $scrapeModel->clickSoftwareSection();
+
+        $data = $scrapeModel->clickPostLinks($crawler);
+
+        echo "_________result data __________ \n";
+        echo "<pre>";
+        var_dump(json_decode(json_encode($data)));
+        echo "</pre>";   
     }
-
-    /**
-     * open post links and fetch post data
-     * @return [type] [description]
-     */
-    public function actionTrypostlink() {
-        $client = new Client();
-
-        // step1: go to home page
-        $crawler = $client->request('GET', 'http://newyork.craigslist.org/');
-
-        // step2: click "software" link
-        $link = $crawler->selectLink('software')->link();
-        $crawler = $client->click($link);   
-        
-        //step3: for each job post link, click and fetch html data
-        $count = 0;
-        $crawler->filter('.hdrlnk')->each( function ($node, $i) use ( & $count, $client )  {
-            //try 3 posts so far
-            if($count > 2) return;
-
-            $count++;
-            //fetch post link
-            $link = $node->link(); 
-            //click the link, get content
-            $subCrawler = $client->click($link);
-            //print out ;)
-            print $node->text(). "\n";
-            print $subCrawler->filter("#postingbody")->html();   
-            print "\n-------------===============------------------\n";
-        });
-    }
-
 
 }
