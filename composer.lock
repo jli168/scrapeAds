@@ -5,6 +5,7 @@
         "This file is @generated automatically"
     ],
     "hash": "1e095c6ab21b511776200e8956e9ab61",
+    "content-hash": "62c655972f50d7dadd1b9176db8fe10b",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -379,7 +380,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/ecf4fc1ef44d2648e77bf0881a5976b72bfbeabf",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/6d6c3a68fbea09c50b251553d59b9209b475e272",
                 "reference": "ecf4fc1ef44d2648e77bf0881a5976b72bfbeabf",
                 "shasum": ""
             },
@@ -652,7 +653,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/browser-kit/zipball/5157a879fcc45835059aef7d1c7223289b89a7db",
+                "url": "https://api.github.com/repos/symfony/browser-kit/zipball/4ad7b96c4546b85d75dc8a7f0d3234518b5dd05a",
                 "reference": "5157a879fcc45835059aef7d1c7223289b89a7db",
                 "shasum": ""
             },
@@ -707,7 +708,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/css-selector/zipball/643c13a4443f313d50eac4d408f07d2ffb90f4b0",
+                "url": "https://api.github.com/repos/symfony/css-selector/zipball/b02e0da3b07c3f8d3a610cfeee091f0d3d7155e4",
                 "reference": "643c13a4443f313d50eac4d408f07d2ffb90f4b0",
                 "shasum": ""
             },
@@ -760,7 +761,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/83d41f25ddd80a75b125ca5de1994b28740b4405",
+                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/15ae076d1b4f52aed1c53bb1b19221052b405719",
                 "reference": "83d41f25ddd80a75b125ca5de1994b28740b4405",
                 "shasum": ""
             },
@@ -813,7 +814,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/e63916c82f24d0254b24cb7acc5368a6479f045e",
+                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/2cb531e0a7ba1d34957557ae1f72b6fb39cc1df3",
                 "reference": "e943b1c6725f9235f1939c6675feeb781a075244",
                 "shasum": ""
             },
@@ -902,7 +903,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-bootstrap/zipball/49c2d45951dd2e98c6217aa071f655016c706846",
+                "url": "https://api.github.com/repos/yiisoft/yii2-bootstrap/zipball/5ca562bcc759fbb1d9e3fe679529e44c912aaf05",
                 "reference": "c25dc1e23d188954b546f6bd95def1027d91113b",
                 "shasum": ""
             },
@@ -1078,7 +1079,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/1003a5797573bfdc3c290d666e6fafef9b2f7f62",
+                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/5c3fa245495903957df6737347cce04d0919a781",
                 "reference": "c8097f5f5db48aa32ae067b84aee4c0fc419b30c",
                 "shasum": ""
             },
@@ -1250,12 +1251,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-faker.git",
-                "reference": "091bc3c5db9e53031817c6e155c0bd518f3606de"
+                "reference": "6968c97fd2e951e8260d1ccc6f5e2109407290eb"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/yiisoft/yii2-faker/zipball/6968c97fd2e951e8260d1ccc6f5e2109407290eb",
-                "reference": "091bc3c5db9e53031817c6e155c0bd518f3606de",
+                "reference": "6968c97fd2e951e8260d1ccc6f5e2109407290eb",
                 "shasum": ""
             },
             "require": {
@@ -1289,7 +1290,7 @@
                 "faker",
                 "yii2"
             ],
-            "time": "2015-07-28 06:25:23"
+            "time": "2015-09-29 10:49:25"
         },
         {
             "name": "yiisoft/yii2-gii",
@@ -1301,7 +1302,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-gii/zipball/fbd134b1cbc06fa149cc546cc98b4e701ba08cb0",
+                "url": "https://api.github.com/repos/yiisoft/yii2-gii/zipball/3946123b429ef6aa95618a4159f3c0360054ddec",
                 "reference": "6519954dc8dd16050d886d1266d6248cbae2d14f",
                 "shasum": ""
             },

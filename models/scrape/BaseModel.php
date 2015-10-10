@@ -41,9 +41,7 @@ class BaseModel extends Component {
 
         $link = $crawler->selectLink( $linkName )->link();
         
-        $crawler = $this->getClient()->click( $link );  
-
-        return $crawler; 
+        return $this->getClient()->click( $link );  
 	}
 
 	public function getPosts( $crawler ) {
