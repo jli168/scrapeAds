@@ -17,16 +17,16 @@ class BaseModel extends Component {
 
 	private $_actions;
 
-	public function __construct( $baseUrl ) {
+	public function __construct( $client, $baseUrl ) {
+		$this->_client = $client;
 		$this->_baseUrl = $baseUrl;
-		$this->_client = new Client();
 
 		parent::__construct();
 	}
 
 	public function init() {
 		$_actions = [
-			'clickSoftwareSection',
+			'clickLinkInHomePage',
 			'clickPostLinks',
 		];
 	}
@@ -35,12 +35,10 @@ class BaseModel extends Component {
 		return $this->_client;
 	}
 
-	public function clickSoftwareSection() {
-		$linkName = "software";
+	public function clickLinkInHomePage($linkName) {
 
         $crawler = $this->getClient()->request( 'GET', $this->_baseUrl );
 
-        // click "software" link
         $link = $crawler->selectLink( $linkName )->link();
         
         $crawler = $this->getClient()->click( $link );  
@@ -48,7 +46,7 @@ class BaseModel extends Component {
         return $crawler; 
 	}
 
-	public function clickPostLinks( $crawler ) {
+	public function getPosts( $crawler ) {
 		$titleLinkFilter = ".hdrlnk";
 
 		$count = 0;

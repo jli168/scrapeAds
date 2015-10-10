@@ -36,11 +36,11 @@ class ScrapeController extends Controller
     public function actionTrymodel() {
         $baseUrl = 'http://newyork.craigslist.org/';
 
-        $scrapeModel = new BaseModel( $baseUrl );
+        $scrapeModel = new BaseModel( new Client(), $baseUrl );
+   
+        $crawler = $scrapeModel->clickLinkInHomePage("software");
 
-        $crawler = $scrapeModel->clickSoftwareSection();
-
-        $data = $scrapeModel->clickPostLinks($crawler);
+        $data = $scrapeModel->getPosts($crawler);
 
         echo "_________result data __________ \n";
         echo "<pre>";
