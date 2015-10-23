@@ -7,12 +7,15 @@
 
 namespace app\commands;
 
-use yii\console\Controller;
+use app\models\scrape\BaseModel;
 
 use Goutte\Client;
 
-use app\models\scrape\BaseModel;
+use yii\console\Controller;
 
+use yii\helpers\ArrayHelper;
+
+use Yii;
 
 /**
  * This command echoes the first argument that you have entered.
@@ -33,19 +36,31 @@ class ScrapeController extends Controller
         echo $message . " the world \n";
     }
 
-    public function actionTrymodel() {
-        $baseUrl = 'http://newyork.craigslist.org/';
+    public function actionTrydb() {
+        $posts = Yii::$app->db->createCommand('SELECT * FROM post')
+                    -> queryAll();
+        echo "<pre>";
+        var_dump(json_decode(json_encode($posts)));
+        echo "</pre>";
+        
+    }
 
-        $scrapeModel = new BaseModel( new Client(), $baseUrl );
+    public function actionTrymodel() {
+        $baseData = [
+            'url' => 'http://newyork.craigslist.org/',
+            'section' => 'software'
+        ];
+
+        $scrapeModel = new BaseModel( new Client(), $baseData['url'] );
    
-        $crawler = $scrapeModel->clickLinkInHomePage("software");
+        $crawler = $scrapeModel->clickLinkInHomePage($baseData['section']);
 
         $data = $scrapeModel->getPosts($crawler);
 
-        echo "_________result data __________ \n";
-        echo "<pre>";
-        var_dump(json_decode(json_encode($data)));
-        echo "</pre>";   
+        $resultArr = array_map( function( $item ) use ( $baseData ) {
+            return ArrayHelper::merge( $item, $baseData );
+        }, $data );
+        
     }
 
 }
