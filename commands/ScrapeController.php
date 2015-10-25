@@ -9,6 +9,8 @@ namespace app\commands;
 
 use app\models\scrape\BaseModel;
 
+use app\models\scrape\Post;
+
 use Goutte\Client;
 
 use yii\console\Controller;
@@ -36,22 +38,46 @@ class ScrapeController extends Controller
         echo $message . " the world \n";
     }
 
+
+    /**
+     * test if database connection works
+     */
     public function actionTrydb() {
-        $posts = Yii::$app->db->createCommand('SELECT * FROM post')
-                    -> queryAll();
+
+        $posts = Post::find()->asArray()->all();
+
         echo "<pre>";
         var_dump(json_decode(json_encode($posts)));
         echo "</pre>";
         
     }
 
+    /**
+     * test if inserting to active record works
+     */
+    public function actionTryinsert(){
+        $post = new Post();
+        $post->attributes = [
+            'content' => "abalkjdfadf",
+            'website' => 'http://newyork.craigslist.org/',
+            'section' => 'software',
+            'location' => 'nyc'
+        ];
+        $post->save();
+    }
+
+
+    /**
+     * insert fetched data into database
+     */
     public function actionTrymodel() {
         $baseData = [
-            'url' => 'http://newyork.craigslist.org/',
-            'section' => 'software'
+            'website' => 'http://newyork.craigslist.org/',
+            'section' => 'software',
+            'location' => 'nyc'
         ];
 
-        $scrapeModel = new BaseModel( new Client(), $baseData['url'] );
+        $scrapeModel = new BaseModel( new Client(), $baseData['website'] );
    
         $crawler = $scrapeModel->clickLinkInHomePage($baseData['section']);
 
@@ -60,7 +86,19 @@ class ScrapeController extends Controller
         $resultArr = array_map( function( $item ) use ( $baseData ) {
             return ArrayHelper::merge( $item, $baseData );
         }, $data );
-        
+
+/*       
+        // insert using active record, one by one
+        foreach($resultArr as $result) {
+            $post = new Post();
+            $post->attributes = $result;
+            $post->save();
+        }
+*/        
+        // my fav: batch insert
+        Post::batchInsert( $resultArr );
+
+        echo "good to go! \n";            
     }
 
 }

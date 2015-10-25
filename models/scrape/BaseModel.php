@@ -17,6 +17,10 @@ class BaseModel extends Component {
 
 	private $_actions;
 
+	/**
+	 * @param Client $client
+	 * @param string $baseUrl
+	 */
 	public function __construct( $client, $baseUrl ) {
 		$this->_client = $client;
 		$this->_baseUrl = $baseUrl;
