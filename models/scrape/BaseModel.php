@@ -17,6 +17,9 @@ class BaseModel extends Component {
 
 	private $_actions;
 
+	//number of links to fetch each time
+	private $_linkNumbers;
+
 	/**
 	 * @param Client $client
 	 * @param string $baseUrl
@@ -24,7 +27,7 @@ class BaseModel extends Component {
 	public function __construct( $client, $baseUrl ) {
 		$this->_client = $client;
 		$this->_baseUrl = $baseUrl;
-
+		$this->_linkNumbers = 10;
 		parent::__construct();
 	}
 
@@ -60,8 +63,7 @@ class BaseModel extends Component {
 		$crawler->filter($titleLinkFilter)->each( function ($node, $i) use ( & $count, $client, & $data )  {
 			$postContentFilter = "#postingbody";
             
-            //try 3 posts so far
-            if($count > 2) return;
+            if($count > $this->_linkNumbers) return;
 
             $count++;
             //fetch post link
