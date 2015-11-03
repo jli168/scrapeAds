@@ -42,6 +42,29 @@ class BaseModel extends Component {
 		return $this->_client;
 	}
 
+	/**
+	 * [clickLinkInHomePage2 is able to use hard coded pattern 
+	 * to find the "help-wanted" section in the ad!
+	 *
+	 * TODO: find all job listing!
+	 * @param  [type] $linkName [description]
+	 * @return [type]           [description]
+	 */
+	public function clickLinkInHomePage2( $linkName ) {
+        $crawler = $this->getClient()->request( 'GET', $this->_baseUrl );
+		$category = $crawler->filter("body .container .rightBlue ")->eq(1);
+		echo "current category: ". $category->filter("h3")->text() ."\n";
+
+		$catNode =  $crawler->filter(".rightBlue > ul > li > a")
+			->reduce( function( $node, $i ) {
+				$pattern = "/ny-help-wanted/";
+				$url = $node->attr("href");
+				return ( bool ) preg_match($pattern, $url, $matches);
+			} );
+
+		echo "we get: " . $catNode->attr("href"). '---' . $catNode->text() ."\n";
+	}
+
 	public function clickLinkInHomePage($linkName) {
 
         $crawler = $this->getClient()->request( 'GET', $this->_baseUrl );

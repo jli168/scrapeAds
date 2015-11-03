@@ -68,6 +68,23 @@ class ScrapeController extends Controller
 
 
     /**
+     * try out worldjournal.com
+     */
+    public function actionTrywj() {
+        $baseData = [
+            //select chinese simplified font, and location: ny
+            'website' => 'http://www.wjlife.com/classifieds/?variant=zh-cn&regions=state_ny',
+            //select 'help-wanted' section
+            'section' => 'help-wanted',
+            'location' => 'ny'
+        ];
+        echo "start wj \n";
+        $scrapeModel = new BaseModel( new Client(), $baseData['website'] );
+        $crawler = $scrapeModel->clickLinkInHomePage2($baseData['section']);
+        echo "end wj \n";
+    }
+
+    /**
      * insert fetched data into database
      */
     public function actionTrymodel() {
