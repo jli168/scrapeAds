@@ -8,11 +8,12 @@
 namespace app\commands;
 
 use app\models\scrape\BaseModel;
-
+use app\models\scrape\WJModel;
 use app\models\scrape\Post;
 
 use Goutte\Client;
-
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\Link;
 use yii\console\Controller;
 
 use yii\helpers\ArrayHelper;
@@ -20,12 +21,7 @@ use yii\helpers\ArrayHelper;
 use Yii;
 
 /**
- * This command echoes the first argument that you have entered.
- *
- * This command is provided as an example for you to learn how to create console commands.
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
+ * ScrapeController does the work of scraping website data
  */
 class ScrapeController extends Controller
 {
@@ -38,7 +34,6 @@ class ScrapeController extends Controller
         echo $message . " the world \n";
     }
 
-
     /**
      * test if database connection works
      */
@@ -49,7 +44,6 @@ class ScrapeController extends Controller
         echo "<pre>";
         var_dump(json_decode(json_encode($posts)));
         echo "</pre>";
-        
     }
 
     /**
@@ -66,9 +60,68 @@ class ScrapeController extends Controller
         $post->save();
     }
 
+    /**
+     * simulate worldjournal ajax call to fetch content data
+     */
+    public function actionTrypostdata() {
+        $hostname = 'www.wjlife.com';
+        $optionVaules = [
+            "relation" => "AND",
+            "0" => [
+                "relation" => "AND",
+                "0" => [
+                    "key" => "wj_order_id"
+                ]
+            ]
+        ];     
+        //all help wanted
+        $currentURL="/cls_category/03-ny-help-wanted/";      
+
+        //temp page number
+        $pno = 0;
+
+        $queryObject= [
+            "keyword" => "",
+            "pagesize" => 40, //specify how many rows you want to pull each request
+            "pno" => $pno,
+            "optionVaules" => $optionVaules, 
+            "currentURL" => "http://" . $hostname . $currentURL,
+            // "currentCatId" => 326, //general help
+            "currentCatId" => 327, //restaurant help, hardcoded in their js code
+            "currentStateId" => 152,
+        ];
+
+        //language: chinese simplified
+        $wjlang = "zh-cn";
+        $requestUrl =  "http://" . $hostname
+                        . "/wp-content/themes/wjlife/includes/classified-core.php?regions=state_ny&variant=" . $wjlang
+                        . "&t=" . time();
+        // echo "start...\n";
+        $client = new Client();
+        $crawler = $client->request( "POST", $requestUrl,  $queryObject , [], [
+            'HTTP_X-Requested-With' => 'XMLHttpRequest',
+            'contentType' => 'application/x-www-form-urlencoded;charset=utf-8',
+        ] );
+        $rowHtml = $crawler->html();
+        // if you want to echo out with correct encoding, do `echo utf8_decode($rowHtml)`
+        // echo utf8_decode($rowHtml);
+        // echo "end...\n";
+        
+        $subCrawler = new Crawler();
+        $subCrawler->addHtmlContent($rowHtml);
+
+        $linkArray = $subCrawler->filter(".catDesc a")->each( function( $node, $index ){
+            return $href = $node->attr('href');
+        } );
+
+        print_r($linkArray);
+    }
 
     /**
      * try out worldjournal.com
+     *
+     * it seems not working, because the content is from ajax call! 
+     * can not crawl this!
      */
     public function actionTrywj() {
         $baseData = [
@@ -81,8 +134,59 @@ class ScrapeController extends Controller
         echo "start wj \n";
         $scrapeModel = new BaseModel( new Client(), $baseData['website'] );
         $crawler = $scrapeModel->clickLinkInHomePage2($baseData['section']);
-        echo "end wj \n";
+        echo "<pre>";
+        var_dump(json_decode(json_encode($crawler->html())));
+        echo "</pre>";
     }
+
+    public function actionTrywj2() {
+        $link = 'http://www.wjlife.com/classified/l-i-japanese-hiring-servers-631-486-8900/?variant=zh-cn';
+        $client = new Client();
+        $crawler = $client->request( 'GET', $link);
+
+        // get title:
+        $title = $crawler->filter(".classifiedTitle h4")->text();
+        echo "title: " . trim( $title ). "\n";
+
+        $rawContent = $crawler->filter(".classifiedDetails")->text();
+
+        
+        $contentArr = explode( "\n", trim( $rawContent ) );
+        print_r($contentArr);
+
+        // get location:
+        $location = $this->findAdLocation( trim( $contentArr[0] ) );
+        echo "location: " . $location . "\n";
+
+        // get content:
+        $content = trim( $contentArr[1] );
+
+
+        echo "content: $content \n";
+    }
+
+    /**
+     * actionCrawlWJ crawls worldjournal's restaurant help wanted section
+     */
+    public function actionCrawlwj() {
+        // set 300 seconds time limit to run this program
+        set_time_limit(300);
+
+        $wjModel = new WJModel();
+
+        $time_start = microtime(true);
+
+        $posts = $wjModel->fetchAdData();
+
+        $time_end = microtime(true);
+
+        echo "time spent on crawling: " . ( $time_end - $time_start ) . "\n";
+
+        Post::batchInsert( $posts );  
+
+        echo "data inserted \n";
+    }
+
 
     /**
      * insert fetched data into database

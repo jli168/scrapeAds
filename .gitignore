@@ -29,3 +29,5 @@ phpunit.phar
 # vagrant settings
 .vagrant
 
+#### Temp ignores ####
+temp*.php

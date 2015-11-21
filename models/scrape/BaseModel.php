@@ -63,6 +63,8 @@ class BaseModel extends Component {
 			} );
 
 		echo "we get: " . $catNode->attr("href"). '---' . $catNode->text() ."\n";
+		
+		return $this->getClient()->click( $catNode->link() );
 	}
 
 	public function clickLinkInHomePage($linkName) {
@@ -74,6 +76,11 @@ class BaseModel extends Component {
         return $this->getClient()->click( $link );  
 	}
 
+	/**
+	 * handle craiglist
+	 * @param  [type] $crawler [description]
+	 * @return [type]          [description]
+	 */
 	public function getPosts( $crawler ) {
 		$titleLinkFilter = ".hdrlnk";
 
