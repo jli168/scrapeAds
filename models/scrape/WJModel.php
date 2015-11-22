@@ -16,81 +16,79 @@ class WJModel extends Component {
 	/**
 	 * @var string    
 	 */
-	private $_hostname;
+	public $_hostname;
 
 	/**
 	 * @var string 	Ajax request Url  
 	 */	
-	private $_requestUrl;
+	public $_requestUrl;
 
 	/**
 	 * @var string 	language   
 	 */	
-	private $_wjlang;
+	public $_wjlang;
 
 	/**
 	 * @var integer  Ad Category Id
 	 */	
-	private $_currentCatId;
+	public $_currentCatId;
 
 	/**
 	 * @var string 	Current Category name;   
 	 */		
-	private $_currentCatName;
+	public $_currentCatName;
 
 	/**
 	 * @var string 	Current Region name;   
 	 */		
-	private $_currentRegionName;
+	public $_currentRegionName;
 
 	/**
 	 * @var integer  Ad State Id
 	 */	
-	private $_currentStateId;
+	public $_currentStateId;
 
 	/**
 	 * @var integer  Ad numbers to fetch per ajax call
 	 */	
-	private $_pageSize;
+	public $_pageSize;
 
 	/**
 	 * @var array 	ajax query data options 
 	 */	
-	private $_optionVaules;
+	public $_optionVaules;
 
 	/**
 	 * @var array
 	 */
-	private $_requestHeader;
+	public $_requestHeader;
 
 	/**
 	 * @var Goutte\Client 	    
 	 */
-	private $_client;
+	public $_client;
 
 	/**
 	 * @var DomCrawler\Crawler
 	 */
-	private $_crawler;
+	public $_crawler;
 
 	public function init(){
 		parent::init();
 
-		$this->_hostname = 'http://www.wjlife.com';
+        $this->setClient();
 
-		$this->_wjlang = "zh-cn"; 
+        $this->setCrawler();
 
-		$this->_currentRegionName = "state_ny";
+		/**
+		 *  The following settings are copied from worldjournal ajax request
+		 */
 
 		$this->_requestUrl = $this->_hostname
-			. "/wp-content/themes/wjlife/includes/classified-core.php?regions="
-			. $this->_currentRegionName
-			. "&variant=" 
-			. $this->_wjlang
+			. "/wp-content/themes/wjlife/includes/classified-core.php"
+			. "?regions=". $this->_currentRegionName
+			. "&variant=". $this->_wjlang
 			. "&t=" . time();
-
-		// fetch first 100 ad links
-		$this->_pageSize = 100;
 
 		$this->_optionVaules = [
 			"relation" => "AND",
@@ -106,14 +104,6 @@ class WJModel extends Component {
             'HTTP_X-Requested-With' => 'XMLHttpRequest',
             'contentType' => 'application/x-www-form-urlencoded;charset=utf-8',
         ];
-
-        $this->_currentStateId = 327; //restaurant help, hardcoded in their js code
-        $this->_currentCatName = 'restaurant help'; 
-        $this->_currentRegionName = 152;
-
-        $this->setClient();
-
-        $this->setCrawler();
 	}
 
 	public function setClient() {
@@ -145,9 +135,9 @@ class WJModel extends Component {
             "pagesize" => $this->_pageSize, //specify how many rows you want to pull each request
             "pno" => 0, // only need fetch the first page
             "optionVaules" => $this->_optionVaules, 
-            "currentURL" => $this->_hostname, // . $currentURL,
-            "currentCatId" => $this->_currentStateId, //restaurant help, hardcoded in their js code
-            "currentStateId" => $this->_currentRegionName,
+            "currentURL" => $this->_hostname, 
+            "currentCatId" => $this->_currentCatId, 
+            "currentStateId" => $this->_currentStateId,
         ];
 
         $crawler = $this->getClient()->request( "POST", $this->_requestUrl,  $queryObject , [], $this->_requestHeader );
@@ -207,7 +197,7 @@ class WJModel extends Component {
 	 * @param  string $adlink 
 	 * @return array  post data
 	 */
-	protected function fetchPostDataFromAdContent( $adlink ) {
+	public function fetchPostDataFromAdContent( $adlink ) {
 		// add languague preference to link
 		$adlink = $adlink . "?variant=" . $this->_wjlang;
 
@@ -219,6 +209,10 @@ class WJModel extends Component {
 		$title = $crawler->filter(".classifiedTitle h4")->text();
 		$post['title'] = trim( $title );
 
+		// get website:
+		$shortUrl = $crawler->filter("#qr_code")->attr("data-url");
+		$post[ 'website' ] = $shortUrl;
+
 		$rawContent = $crawler->filter(".classifiedDetails")->text();
 		$contentArr = explode( "\n", trim( $rawContent ) );
 
@@ -228,9 +222,6 @@ class WJModel extends Component {
 
 		// get content:
 		$post[ 'content' ] = trim( $contentArr[ 1 ] );
-
-		// get website:
-		$post[ 'website' ] = $this->_hostname;
 
 		// get section:
         $post[ 'section' ] = $this->_currentCatName;

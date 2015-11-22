@@ -139,6 +139,10 @@ class ScrapeController extends Controller
         echo "</pre>";
     }
 
+    /**
+     * actionTrywj2 fetch data from a single ad link using straight forward way
+     * 
+     */
     public function actionTrywj2() {
         $link = 'http://www.wjlife.com/classified/l-i-japanese-hiring-servers-631-486-8900/?variant=zh-cn';
         $client = new Client();
@@ -150,7 +154,6 @@ class ScrapeController extends Controller
 
         $rawContent = $crawler->filter(".classifiedDetails")->text();
 
-        
         $contentArr = explode( "\n", trim( $rawContent ) );
         print_r($contentArr);
 
@@ -161,32 +164,53 @@ class ScrapeController extends Controller
         // get content:
         $content = trim( $contentArr[1] );
 
-
         echo "content: $content \n";
+    }
+
+    /**
+     * try to use class configuration instead of init in class
+     */
+    public function actionTrywj3() {
+        $wjModel = Yii::$app->wjscraper;
+        $posts = $wjModel->fetchAdData();
+        echo "<pre>";
+        var_dump(json_decode(json_encode($posts)));
+        echo "</pre>";
+    }
+
+    /**
+     * actionTrywj4 fetch ad data by an ad link
+     * @return array  ad postdata
+     */
+    public function actionTrywj4() {
+        $wjModel = Yii::$app->wjscraper;
+        $adlink = "http://www.wjlife.com/classified/l-i-japanese-hiring-servers-631-486-8900/";
+        $post = $wjModel->fetchPostDataFromAdContent($adlink);
+        echo "<pre>";
+        var_dump(json_decode(json_encode($post)));
+        echo "</pre>";
+        
     }
 
     /**
      * actionCrawlWJ crawls worldjournal's restaurant help wanted section
      */
     public function actionCrawlwj() {
-        // set 300 seconds time limit to run this program
-        set_time_limit(300);
-
-        $wjModel = new WJModel();
+        // set 500 seconds time limit to run this program
+        set_time_limit(500);
 
         $time_start = microtime(true);
 
-        $posts = $wjModel->fetchAdData();
+        $posts = Yii::$app->wjscraper->fetchAdData();
 
         $time_end = microtime(true);
 
         echo "time spent on crawling: " . ( $time_end - $time_start ) . "\n";
-
+        
         Post::batchInsert( $posts );  
 
         echo "data inserted \n";
     }
-
 
     /**
      * insert fetched data into database

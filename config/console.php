@@ -4,6 +4,7 @@ Yii::setAlias('@tests', dirname(__DIR__) . '/tests');
 
 $params = require(__DIR__ . '/params.php');
 $db = require(__DIR__ . '/db.php');
+$scraper = require(__DIR__ . '/scraper.php');
 
 $config = [
     'id' => 'basic-console',
@@ -23,6 +24,7 @@ $config = [
             ],
         ],
         'db' => $db,
+        'wjscraper' => $scraper['worldjournal'],
     ],
     'params' => $params,
 ];
