@@ -10,6 +10,12 @@ return [
 		'_currentRegionName' => "state_ny",
 		'_wjlang' => "zh-cn",
 		'_pageSize' => 100, // fetch ad counts per ajax call
+		// '_client' =>  [
+		// 	'class' => 'Goutte\Client'
+		// ],
+		// '_crawler' => [
+		// 	'class' => 'Symfony\Component\DomCrawler\Crawler'
+		// ],
 	],
 	'craigslist' => [
 
