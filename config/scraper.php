@@ -1,6 +1,10 @@
 <?php
 
 return [
+	'goutteClient' => [
+		'class' => 'Goutte\Client',
+	],
+
 	'worldjournal' => [
 		'class' => 'app\models\scrape\WJModel',
 		'_hostname' => 'http://www.wjlife.com',
@@ -18,7 +22,11 @@ return [
 		// ],
 	],
 	'craigslist' => [
-
+		'class' => 'app\models\scrape\CLModel',
+		'_hostname' => 'http://newyork.craigslist.org/',
+		'_sectionName' => 'software',
+		'_sectionEndpoint' => 'search/sof',
+		'_linkCount' => 3,
 	],
 
 ];

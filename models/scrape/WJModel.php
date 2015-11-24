@@ -8,6 +8,8 @@ use Symfony\Component\DomCrawler\Crawler;
 
 use yii\base\Component;
 
+use Yii;
+
 /**
  * WJModel is the model that scrape worldjournal.com ads
  * 
@@ -129,6 +131,12 @@ class WJModel extends Component {
 	}
 
 	// Step1: fetch currentCatId's ajax call data, and filter out list of ads
+	
+	/**
+	 * fetchAdLinksFromAdCategoryAjaxCall fetch ad links from current ad category by ajax call
+	 * 
+	 * @return array  Ad itemlinks
+	 */
 	public function fetchAdLinksFromAdCategoryAjaxCall() {
 		$queryObject = [
             "keyword" => "",

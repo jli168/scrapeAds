@@ -24,7 +24,11 @@ $config = [
             ],
         ],
         'db' => $db,
+
+        //might need to merge array instead of doing it manually
+        'goutteClient' => $scraper['goutteClient'],
         'wjscraper' => $scraper['worldjournal'],
+        'clscraper' => $scraper['craigslist'],
     ],
     'params' => $params,
 ];

@@ -9,6 +9,7 @@ namespace app\commands;
 
 use app\models\scrape\BaseModel;
 use app\models\scrape\WJModel;
+use app\models\scrape\CLModel;
 use app\models\scrape\Post;
 
 use Goutte\Client;
@@ -244,6 +245,20 @@ class ScrapeController extends Controller
         Post::batchInsert( $resultArr );
 
         echo "good to go! \n";            
+    }
+
+    /**
+     * [actionCrawlcl description]
+     * @return [type] [description]
+     */
+    public function actionCrawlcl() {
+        echo "in action crawllc". PHP_EOL;
+        $clscraper = Yii::$app->clscraper;
+        $posts = $clscraper->fetchAdLinksFromSection();
+        
+        // test
+        $adcontent = $clscraper->fetchAdContentFromAdLink($posts[1]);
+
     }
 
 }
