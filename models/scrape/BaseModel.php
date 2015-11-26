@@ -51,10 +51,16 @@ abstract class BaseModel extends Component {
 	 * 
 	 * @return array   Ad data
 	 */
-	abstract public function fetchAdData() {
-
-	}
-
+	abstract public function fetchAdData();
+	
+	/**
+	 * fetchAdContentFromAdLink will be overriden by subclasses
+	 * @param  string $adlink 
+	 * 
+	 * @return  array  Ad content
+	 */
+	abstract protected function fetchAdContentFromAdLink( $adlink );
+	
 	/**
 	 * fetchAdContentsFromAdLinks description]
 	 * @param  array $adLinks 
@@ -65,6 +71,10 @@ abstract class BaseModel extends Component {
 
 		foreach ( $this->generateAdLinks( $adLinks ) as $adlink) {
 			echo "adLink: ".$adlink. "\n";
+			if( $this->isCrawled( $adlink ) ) {
+				echo "this link is already fetched...";
+				break;
+			}
 	        $posts[] = $this->fetchAdContentFromAdLink( $adlink );
 		}
 		
@@ -85,14 +95,20 @@ abstract class BaseModel extends Component {
 		}
 	}
 
-	/**
-	 * fetchAdContentFromAdLink will be overriden by subclasses
-	 * @param  string $adlink 
-	 * 
-	 * @return  array  Ad content
-	 */
-	abstract protected function fetchAdContentFromAdLink( $adlink ) {
 
+	/**
+	 * isCrawled return true if $adlink is already in Post database table's 'website' column. 
+	 * it can be overriden if subclass does not store adlink there.
+	 *
+	 * @param  string  $adlink  
+	 * @return boolean         
+	 */
+	public function isCrawled( $adlink ) {
+		$ad = Post::findOne( [
+			'website' => $adlink,
+		] );
+
+		return $ad !== null;
 	}
 
 }

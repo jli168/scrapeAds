@@ -193,4 +193,12 @@ class WJModel extends BaseModel {
 
         return null;
     }
+
+    public function isCrawled ( $adlink ) {
+    	$adData = $this->fetchAdContentFromAdLink ( $adlink );
+
+    	$website = $adData[ 'website' ];
+
+    	return parent::isCrawled( $website );
+    }
 }

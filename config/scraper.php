@@ -15,13 +15,13 @@ return [
 		'_wjlang' => "zh-cn",
 		'_pageSize' => 50, // fetch ad counts per ajax call
 	],
-	
+
 	'craigslist' => [
 		'class' => 'app\models\scrape\CLModel',
 		'_hostname' => 'http://newyork.craigslist.org/',
 		'_sectionName' => 'software',
 		'_sectionEndpoint' => 'search/sof',
-		'_linkCount' => 30,
+		'_linkCount' => 100,
 		'_location' => 'new york city',
 	],
 ];

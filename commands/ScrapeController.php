@@ -61,6 +61,16 @@ class ScrapeController extends Controller
         $post->save();
     }
 
+    public function actionTryiscrawled() {
+        $adlink = 'http://www.wjlife.com/176820/article-shortlink/';
+
+        if( Yii::$app->wjscraper->isCrawled($adlink) ){
+            echo "crawled already";
+        }else {
+            echo "not yet";
+        }
+    }
+
     /**
      * simulate worldjournal ajax call to fetch content data
      */
@@ -118,133 +128,33 @@ class ScrapeController extends Controller
         print_r($linkArray);
     }
 
-    /**
-     * try out worldjournal.com
-     *
-     * it seems not working, because the content is from ajax call! 
-     * can not crawl this!
-     */
-    public function actionTrywj() {
-        $baseData = [
-            //select chinese simplified font, and location: ny
-            'website' => 'http://www.wjlife.com/classifieds/?variant=zh-cn&regions=state_ny',
-            //select 'help-wanted' section
-            'section' => 'help-wanted',
-            'location' => 'ny'
-        ];
-        echo "start wj \n";
-        $scrapeModel = new BaseModel( new Client(), $baseData['website'] );
-        $crawler = $scrapeModel->clickLinkInHomePage2($baseData['section']);
-        echo "<pre>";
-        var_dump(json_decode(json_encode($crawler->html())));
-        echo "</pre>";
-    }
+    public function crawl( BaseModel $model ) {
+        // set 500 seconds time limit to run this program
+        set_time_limit(500);
 
-    /**
-     * actionTrywj2 fetch data from a single ad link using straight forward way
-     * 
-     */
-    public function actionTrywj2() {
-        $link = 'http://www.wjlife.com/classified/l-i-japanese-hiring-servers-631-486-8900/?variant=zh-cn';
-        $client = new Client();
-        $crawler = $client->request( 'GET', $link);
+        $time_start = microtime(true);
 
-        // get title:
-        $title = $crawler->filter(".classifiedTitle h4")->text();
-        echo "title: " . trim( $title ). "\n";
+        $posts = $model->fetchAdData();
 
-        $rawContent = $crawler->filter(".classifiedDetails")->text();
+        $time_end = microtime(true);
 
-        $contentArr = explode( "\n", trim( $rawContent ) );
-        print_r($contentArr);
-
-        // get location:
-        $location = $this->findAdLocation( trim( $contentArr[0] ) );
-        echo "location: " . $location . "\n";
-
-        // get content:
-        $content = trim( $contentArr[1] );
-
-        echo "content: $content \n";
-    }
-
-    /**
-     * try to use class configuration instead of init in class
-     */
-    public function actionTrywj3() {
-        $wjModel = Yii::$app->wjscraper;
-        $posts = $wjModel->fetchAdData();
-        echo "<pre>";
-        var_dump(json_decode(json_encode($posts)));
-        echo "</pre>";
-    }
-
-    /**
-     * actionTrywj4 fetch ad data by an ad link
-     * @return array  ad postdata
-     */
-    public function actionTrywj4() {
-        $wjModel = Yii::$app->wjscraper;
-        $adlink = "http://www.wjlife.com/classified/l-i-japanese-hiring-servers-631-486-8900/";
-        $post = $wjModel->fetchPostDataFromAdContent($adlink);
-        echo "<pre>";
-        var_dump(json_decode(json_encode($post)));
-        echo "</pre>";
+        echo "time spent on crawling: " . ( $time_end - $time_start ) . "\n";
         
+        if( !empty( $posts ) ) {
+            Post::batchInsert( $posts );  
+
+            echo "data inserted \n";
+        } else {
+            echo "no need data \n";
+        }
+
     }
 
     /**
      * actionCrawlWJ crawls worldjournal's restaurant help wanted section
      */
     public function actionCrawlwj() {
-        // set 500 seconds time limit to run this program
-        set_time_limit(500);
-
-        $time_start = microtime(true);
-
-        $posts = Yii::$app->wjscraper->fetchAdData();
-
-        $time_end = microtime(true);
-
-        echo "time spent on crawling: " . ( $time_end - $time_start ) . "\n";
-        
-        Post::batchInsert( $posts );  
-
-        echo "data inserted \n";
-    }
-
-    /**
-     * insert fetched data into database
-     */
-    public function actionTrymodel() {
-        $baseData = [
-            'website' => 'http://newyork.craigslist.org/',
-            'section' => 'software',
-            'location' => 'nyc'
-        ];
-
-        $scrapeModel = new BaseModel( new Client(), $baseData['website'] );
-   
-        $crawler = $scrapeModel->clickLinkInHomePage($baseData['section']);
-
-        $data = $scrapeModel->getPosts($crawler);
-
-        $resultArr = array_map( function( $item ) use ( $baseData ) {
-            return ArrayHelper::merge( $item, $baseData );
-        }, $data );
-
-/*       
-        // insert using active record, one by one
-        foreach($resultArr as $result) {
-            $post = new Post();
-            $post->attributes = $result;
-            $post->save();
-        }
-*/        
-        // my fav: batch insert
-        Post::batchInsert( $resultArr );
-
-        echo "good to go! \n";            
+        $this->crawl( Yii::$app->wjscraper );
     }
 
     /**
@@ -252,19 +162,6 @@ class ScrapeController extends Controller
      * @return [type] [description]
      */
     public function actionCrawlcl() {
-        echo "in action crawllc". PHP_EOL;
-        $clscraper = Yii::$app->clscraper;
-
-        $time_start = microtime(true);
-
-        $posts = $clscraper->fetchAdData();
-
-        $time_end = microtime(true);
-
-        echo "time spent on crawling: " . ( $time_end - $time_start ) . "\n";
-
-        Post::batchInsert( $posts );  
-        
+        $this->crawl( Yii::$app->clscraper );
     }
-
 }
