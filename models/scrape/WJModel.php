@@ -180,7 +180,7 @@ class WJModel extends Component {
 
 		foreach ( $this->generateAdLinks( $adLinks ) as $adlink) {
 			echo "adLink: ".$adlink. "\n";
-	        $posts[] = $this->fetchPostDataFromAdContent( $adlink );
+	        $posts[] = $this->fetchAdContentFromAdLink( $adlink );
 		}
 		
 		return $posts;
@@ -201,11 +201,11 @@ class WJModel extends Component {
 	}
 
 	/**
-	 * fetchPostDataFromAdContent crawl link data and save ad data to post array
+	 * fetchAdContentFromAdLink crawl link data and save ad data to post array
 	 * @param  string $adlink 
 	 * @return array  post data
 	 */
-	public function fetchPostDataFromAdContent( $adlink ) {
+	public function fetchAdContentFromAdLink( $adlink ) {
 		// add languague preference to link
 		$adlink = $adlink . "?variant=" . $this->_wjlang;
 

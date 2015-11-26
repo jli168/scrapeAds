@@ -73,6 +73,13 @@ class CLModel extends Component {
         $this->setCrawler();
     }
 
+	public function fetchAdData() {
+		$adLinks = $this->fetchAdLinksFromSection();
+
+		$adLinks = array_slice($adLinks, 0, $this->_linkCount);
+		return $this->fetchAdContentsFromAdLinks( $adLinks );
+	}
+
     /**
      * fetchAdLinksFromSection fetch ad links from current section
      * 
@@ -90,6 +97,36 @@ class CLModel extends Component {
 		} );
     }
 
+	/**
+	 * fetchAdContentsFromAdLinks description]
+	 * @param  array $adLinks 
+	 * @return array array of post data
+	 */
+	public function fetchAdContentsFromAdLinks( $adLinks ) {
+		$posts = array();
+
+		foreach ( $this->generateAdLinks( $adLinks ) as $adlink) {
+			echo "adLink: ".$adlink. "\n";
+	        $posts[] = $this->fetchAdContentFromAdLink( $adlink );
+		}
+		
+		return $posts;
+	}
+
+	/**
+	 * generateAdLinks uses php 5.6 feature "generator" to loop through array.
+	 * it also sleep between requests to prevent continuous requests from being blocked. 
+	 * @param  [type] $adLinks [description]
+	 * @return [type]          [description]
+	 */
+	protected function generateAdLinks( $adLinks ) {
+		$length = count( $adLinks );
+		for( $i = 0; $i < $length; $i++ ){
+			usleep(20000); // sleep 0.02 seconds between requests
+			yield $adLinks[$i];
+		}
+	}
+
     /**
      * fetchAdContentFromAdLink crawl $adlink and fetch ad content,
      * returns ad content as an array
@@ -102,8 +139,15 @@ class CLModel extends Component {
 		$postContentFilter = "#postingbody";
 
 		$data = [];
-		$data[ 'title' ] = $crawler->filter(".postingtitletext")->html();
+		$data[ 'title' ] = $crawler->filter(".postingtitletext")->text();
 		$data[ 'content' ] = $crawler->filter( $postContentFilter )->text();
+
+		// compensation and employment type info
+		$comp = $crawler->filter(".attrgroup > span")->each(function($node){
+			return $node->text();
+		});
+
+		$data[ 'content' ] .= "\n" . ucwords(implode("\n", $comp));
 
 		return $data;		
     }

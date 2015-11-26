@@ -254,11 +254,17 @@ class ScrapeController extends Controller
     public function actionCrawlcl() {
         echo "in action crawllc". PHP_EOL;
         $clscraper = Yii::$app->clscraper;
-        $posts = $clscraper->fetchAdLinksFromSection();
-        
-        // test
-        $adcontent = $clscraper->fetchAdContentFromAdLink($posts[1]);
 
+        $time_start = microtime(true);
+
+        $posts = $clscraper->fetchAdData();
+
+        $time_end = microtime(true);
+
+        echo "time spent on crawling: " . ( $time_end - $time_start ) . "\n";
+
+        Post::batchInsert( $posts );  
+        
     }
 
 }
