@@ -13,20 +13,15 @@ return [
 		'_currentStateId' => 152,
 		'_currentRegionName' => "state_ny",
 		'_wjlang' => "zh-cn",
-		'_pageSize' => 100, // fetch ad counts per ajax call
-		// '_client' =>  [
-		// 	'class' => 'Goutte\Client'
-		// ],
-		// '_crawler' => [
-		// 	'class' => 'Symfony\Component\DomCrawler\Crawler'
-		// ],
+		'_pageSize' => 50, // fetch ad counts per ajax call
 	],
+	
 	'craigslist' => [
 		'class' => 'app\models\scrape\CLModel',
 		'_hostname' => 'http://newyork.craigslist.org/',
 		'_sectionName' => 'software',
 		'_sectionEndpoint' => 'search/sof',
 		'_linkCount' => 30,
+		'_location' => 'new york city',
 	],
-
 ];

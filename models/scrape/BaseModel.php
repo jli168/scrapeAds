@@ -4,111 +4,95 @@ namespace app\models\scrape;
 
 use Goutte\Client;
 
+use Symfony\Component\DomCrawler\Crawler;
+
 use yii\base\Component;
 
 /**
- * BaseModel is the model behind scraping 
+ * BaseModel provides common properties and functions for all crawling models
  */
-class BaseModel extends Component {
-
-	private $_baseUrl;
-
-	private $_client;
-
-	private $_actions;
-
-	//number of links to fetch each time
-	private $_linkNumbers;
+abstract class BaseModel extends Component {
+	/**
+	 * @var Goutte\Client 	    
+	 */
+	public $_client;
 
 	/**
-	 * @param Client $client
-	 * @param string $baseUrl
+	 * @var DomCrawler\Crawler
 	 */
-	public function __construct( $client, $baseUrl ) {
-		$this->_client = $client;
-		$this->_baseUrl = $baseUrl;
-		$this->_linkNumbers = 10;
-		parent::__construct();
-	}
+	public $_crawler;
 
-	public function init() {
-		$_actions = [
-			'clickLinkInHomePage',
-			'clickPostLinks',
-		];
+	public function setClient() {
+		$this->_client = new Client();
 	}
 
 	public function getClient() {
 		return $this->_client;
 	}
 
+	public function setCrawler() {
+		$this->_crawler = new Crawler();
+	}
+
+	public function getCrawler() {
+		return $this->_crawler;
+	}
+
+	public function init(){
+		parent::init();
+
+        $this->setClient();
+
+        $this->setCrawler();
+    }
+
 	/**
-	 * [clickLinkInHomePage2 is able to use hard coded pattern 
-	 * to find the "help-wanted" section in the ad!
-	 *
-	 * TODO: find all job listing!
-	 * @param  [type] $linkName [description]
-	 * @return [type]           [description]
+	 * fetchAdData will be overriden by subclasses
+	 * 
+	 * @return array   Ad data
 	 */
-	public function clickLinkInHomePage2( $linkName ) {
-        $crawler = $this->getClient()->request( 'GET', $this->_baseUrl );
-		$category = $crawler->filter("body .container .rightBlue ")->eq(1);
-		echo "current category: ". $category->filter("h3")->text() ."\n";
+	abstract public function fetchAdData() {
 
-		$catNode =  $crawler->filter(".rightBlue > ul > li > a")
-			->reduce( function( $node, $i ) {
-				$pattern = "/ny-help-wanted/";
-				$url = $node->attr("href");
-				return ( bool ) preg_match($pattern, $url, $matches);
-			} );
-
-		echo "we get: " . $catNode->attr("href"). '---' . $catNode->text() ."\n";
-		
-		return $this->getClient()->click( $catNode->link() );
-	}
-
-	public function clickLinkInHomePage($linkName) {
-
-        $crawler = $this->getClient()->request( 'GET', $this->_baseUrl );
-
-        $link = $crawler->selectLink( $linkName )->link();
-        
-        return $this->getClient()->click( $link );  
 	}
 
 	/**
-	 * handle craiglist
-	 * @param  [type] $crawler [description]
+	 * fetchAdContentsFromAdLinks description]
+	 * @param  array $adLinks 
+	 * @return array array of post data
+	 */
+	public function fetchAdContentsFromAdLinks( $adLinks ) {
+		$posts = array();
+
+		foreach ( $this->generateAdLinks( $adLinks ) as $adlink) {
+			echo "adLink: ".$adlink. "\n";
+	        $posts[] = $this->fetchAdContentFromAdLink( $adlink );
+		}
+		
+		return $posts;
+	}
+
+	/**
+	 * generateAdLinks uses php 5.6 feature "generator" to loop through array.
+	 * it also sleep between requests to prevent continuous requests from being blocked. 
+	 * @param  [type] $adLinks [description]
 	 * @return [type]          [description]
 	 */
-	public function getPosts( $crawler ) {
-		$titleLinkFilter = ".hdrlnk";
-
-		$count = 0;
-
-		$client = $this->getClient();
-
-		$data = [];
-
-		$crawler->filter($titleLinkFilter)->each( function ($node, $i) use ( & $count, $client, & $data )  {
-			$postContentFilter = "#postingbody";
-            
-            if($count > $this->_linkNumbers) return;
-
-            $count++;
-            //fetch post link
-            $link = $node->link(); 
-            //click the link, get content
-            $subCrawler = $client->click($link);
-
-            $data[] = [
-            	'title' => $node->text(),
-            	'content' =>  $subCrawler->filter($postContentFilter)->text()
-            ];
-        });
-
-        return $data;
+	protected function generateAdLinks( $adLinks ) {
+		$length = count( $adLinks );
+		for( $i = 0; $i < $length; $i++ ){
+			usleep(20000); // sleep 0.02 seconds between requests
+			yield $adLinks[$i];
+		}
 	}
 
+	/**
+	 * fetchAdContentFromAdLink will be overriden by subclasses
+	 * @param  string $adlink 
+	 * 
+	 * @return  array  Ad content
+	 */
+	abstract protected function fetchAdContentFromAdLink( $adlink ) {
+
+	}
 
 }

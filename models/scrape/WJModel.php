@@ -14,7 +14,7 @@ use Yii;
  * WJModel is the model that scrape worldjournal.com ads
  * 
  */
-class WJModel extends Component {
+class WJModel extends BaseModel {
 	/**
 	 * @var string    
 	 */
@@ -65,22 +65,8 @@ class WJModel extends Component {
 	 */
 	public $_requestHeader;
 
-	/**
-	 * @var Goutte\Client 	    
-	 */
-	public $_client;
-
-	/**
-	 * @var DomCrawler\Crawler
-	 */
-	public $_crawler;
-
 	public function init(){
 		parent::init();
-
-        $this->setClient();
-
-        $this->setCrawler();
 
 		/**
 		 *  The following settings are copied from worldjournal ajax request
@@ -106,22 +92,6 @@ class WJModel extends Component {
             'HTTP_X-Requested-With' => 'XMLHttpRequest',
             'contentType' => 'application/x-www-form-urlencoded;charset=utf-8',
         ];
-	}
-
-	public function setClient() {
-		$this->_client = new Client();
-	}
-
-	public function getClient() {
-		return $this->_client;
-	}
-
-	public function setCrawler() {
-		$this->_crawler = new Crawler();
-	}
-
-	public function getCrawler() {
-		return $this->_crawler;
 	}
 
 	public function fetchAdData() {
@@ -167,37 +137,6 @@ class WJModel extends Component {
 		return $crawler->filter(".catDesc a")->each( function( $node, $index ){
             return $href = $node->attr('href');
         } );
-	}
-
-	// Step2: fetch each item's link content and filter out ad content, 
-	/**
-	 * fetchAdContentsFromAdLinks description]
-	 * @param  array $adLinks 
-	 * @return array array of post data
-	 */
-	public function fetchAdContentsFromAdLinks( $adLinks ) {
-		$posts = array();
-
-		foreach ( $this->generateAdLinks( $adLinks ) as $adlink) {
-			echo "adLink: ".$adlink. "\n";
-	        $posts[] = $this->fetchAdContentFromAdLink( $adlink );
-		}
-		
-		return $posts;
-	}
-
-	/**
-	 * generateAdLinks uses php 5.6 feature "generator" to loop through array.
-	 * it also sleep between requests to prevent continuous requests from being blocked. 
-	 * @param  [type] $adLinks [description]
-	 * @return [type]          [description]
-	 */
-	protected function generateAdLinks( $adLinks ) {
-		$length = count( $adLinks );
-		for( $i = 0; $i < $length; $i++ ){
-			usleep(20000); // sleep 0.02 seconds between requests
-			yield $adLinks[$i];
-		}
 	}
 
 	/**

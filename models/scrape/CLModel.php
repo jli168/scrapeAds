@@ -14,7 +14,7 @@ use Yii;
  * CLModel is the model that scrape newyork.craiglist.org ads
  * 
  */
-class CLModel extends Component {
+class CLModel extends BaseModel {
 
 	public $_hostname;
 
@@ -39,44 +39,12 @@ class CLModel extends Component {
 	 */
 	public $_linkCount;
 
-	/**
-	 * @var Goutte\Client 	    
-	 */
-	public $_client;
-
-	/**
-	 * @var DomCrawler\Crawler
-	 */
-	public $_crawler;
-
-	public function setClient() {
-		$this->_client = new Client();
-	}
-
-	public function getClient() {
-		return $this->_client;
-	}
-
-	public function setCrawler() {
-		$this->_crawler = new Crawler();
-	}
-
-	public function getCrawler() {
-		return $this->_crawler;
-	}
-
-	public function init(){
-		parent::init();
-
-        $this->setClient();
-
-        $this->setCrawler();
-    }
 
 	public function fetchAdData() {
 		$adLinks = $this->fetchAdLinksFromSection();
 
 		$adLinks = array_slice($adLinks, 0, $this->_linkCount);
+
 		return $this->fetchAdContentsFromAdLinks( $adLinks );
 	}
 
@@ -96,36 +64,6 @@ class CLModel extends Component {
 			return $this->_hostname . $node->attr("href");
 		} );
     }
-
-	/**
-	 * fetchAdContentsFromAdLinks description]
-	 * @param  array $adLinks 
-	 * @return array array of post data
-	 */
-	public function fetchAdContentsFromAdLinks( $adLinks ) {
-		$posts = array();
-
-		foreach ( $this->generateAdLinks( $adLinks ) as $adlink) {
-			echo "adLink: ".$adlink. "\n";
-	        $posts[] = $this->fetchAdContentFromAdLink( $adlink );
-		}
-		
-		return $posts;
-	}
-
-	/**
-	 * generateAdLinks uses php 5.6 feature "generator" to loop through array.
-	 * it also sleep between requests to prevent continuous requests from being blocked. 
-	 * @param  [type] $adLinks [description]
-	 * @return [type]          [description]
-	 */
-	protected function generateAdLinks( $adLinks ) {
-		$length = count( $adLinks );
-		for( $i = 0; $i < $length; $i++ ){
-			usleep(20000); // sleep 0.02 seconds between requests
-			yield $adLinks[$i];
-		}
-	}
 
     /**
      * fetchAdContentFromAdLink crawl $adlink and fetch ad content,
@@ -148,6 +86,10 @@ class CLModel extends Component {
 		});
 
 		$data[ 'content' ] .= "\n" . ucwords(implode("\n", $comp));
+
+		$data[ 'website' ] = $requestUrl;
+		$data[ 'section' ] = $this->_sectionName;
+		$data[ 'location' ] = $this->_location;
 
 		return $data;		
     }
