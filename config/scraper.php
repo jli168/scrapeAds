@@ -18,9 +18,9 @@ return [
 
 	'craigslist' => [
 		'class' => 'app\models\scrape\CLModel',
-		'_hostname' => 'http://newyork.craigslist.org/',
+		'_hostname' => 'http://newyork.craigslist.org',
 		'_sectionName' => 'software',
-		'_sectionEndpoint' => 'search/sof',
+		'_sectionEndpoint' => '/search/sof',
 		'_linkCount' => 100,
 		'_location' => 'new york city',
 	],

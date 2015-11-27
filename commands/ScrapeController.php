@@ -128,6 +128,11 @@ class ScrapeController extends Controller
         print_r($linkArray);
     }
 
+    /**
+     * crawl fetch data and insert it into database.
+     * 
+     * @param  BaseModel $model 
+     */
     public function crawl( BaseModel $model ) {
         // set 500 seconds time limit to run this program
         set_time_limit(500);
@@ -147,7 +152,6 @@ class ScrapeController extends Controller
         } else {
             echo "no need data \n";
         }
-
     }
 
     /**
