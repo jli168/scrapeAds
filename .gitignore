@@ -31,3 +31,6 @@ phpunit.phar
 
 #### Temp ignores ####
 temp*.php
+
+# sftp setting
+sftp-config.json

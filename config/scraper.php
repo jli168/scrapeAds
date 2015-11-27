@@ -21,7 +21,7 @@ return [
 		'_hostname' => 'http://newyork.craigslist.org',
 		'_sectionName' => 'software',
 		'_sectionEndpoint' => '/search/sof',
-		'_linkCount' => 100,
+		'_linkCount' => 20,
 		'_location' => 'new york city',
 	],
 ];
