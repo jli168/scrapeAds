@@ -12,6 +12,13 @@ use yii\base\Component;
  * BaseModel provides common properties and functions for all crawling models
  */
 abstract class BaseModel extends Component {
+
+	/**
+	 * @var integer   If there are $_existedLinkCount links already existed in our database, 
+	 * we think all the following links are already in our database. 
+	 */
+	public $_existedLinkCount = 2;
+
 	/**
 	 * @var Goutte\Client 	    
 	 */
@@ -69,12 +76,21 @@ abstract class BaseModel extends Component {
 	public function fetchAdContentsFromAdLinks( $adLinks ) {
 		$posts = array();
 
+		$alreadyFetched = 0;
+
 		foreach ( $this->generateAdLinks( $adLinks ) as $adlink) {
-			echo "adLink: ".$adlink. "\n";
-			if( $this->isCrawled( $adlink ) ) {
-				echo "this link is already fetched...";
+			echo "adLink: ".$adlink. PHP_EOL;
+			if( $this->isAdLinkCrawled( $adlink ) && $alreadyFetched < $this->_existedLinkCount ) {
+				echo "this link is already fetched." . PHP_EOL;
+				$alreadyFetched++;
+				continue;
+			}
+			if( $alreadyFetched === $this->_existedLinkCount ){
+				echo "this link and the following links are already fetched." . PHP_EOL; 
 				break;
 			}
+
+			echo "add it!" . PHP_EOL;
 	        $posts[] = $this->fetchAdContentFromAdLink( $adlink );
 		}
 		
@@ -97,13 +113,13 @@ abstract class BaseModel extends Component {
 
 
 	/**
-	 * isCrawled return true if $adlink is already in Post database table's 'website' column. 
+	 * isAdLinkCrawled return true if $adlink is already in Post database table's 'website' column. 
 	 * it can be overriden if subclass does not store adlink there.
 	 *
 	 * @param  string  $adlink  
 	 * @return boolean         
 	 */
-	public function isCrawled( $adlink ) {
+	public function isAdLinkCrawled( $adlink ) {
 		$ad = Post::findOne( [
 			'website' => $adlink,
 		] );

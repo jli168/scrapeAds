@@ -1,6 +1,15 @@
 <?php
 
 $params = require(__DIR__ . '/params.php');
+$db = require(__DIR__ . '/db.php');
+
+// Include user override config
+$userSettings = file_exists( dirname(__FILE__).'/user.settings.php' ) ?
+    require dirname(__FILE__).'/user.settings.php' : array();
+
+if( !empty( $userSettings ) && array_key_exists( 'db' , $userSettings ) ) {
+    $db = array_merge($db, $userSettings['db']);
+}
 
 $config = [
     'id' => 'basic',
@@ -37,7 +46,7 @@ $config = [
                 ],
             ],
         ],
-        'db' => require(__DIR__ . '/db.php'),
+        'db' => $db,
         /*
         'urlManager' => [
             'enablePrettyUrl' => true,

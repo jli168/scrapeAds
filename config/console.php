@@ -3,8 +3,17 @@
 Yii::setAlias('@tests', dirname(__DIR__) . '/tests');
 
 $params = require(__DIR__ . '/params.php');
-$db = require(__DIR__ . '/db.php');
 $scraper = require(__DIR__ . '/scraper.php');
+$db = require(__DIR__ . '/db.php');
+
+// Include user override settings
+$userSettings = file_exists( dirname(__FILE__).'/user.settings.php' ) ?
+    require dirname(__FILE__).'/user.settings.php' : array();
+
+// Override db setting
+if( !empty( $userSettings ) && array_key_exists( 'db' , $userSettings ) ) {
+    $db = array_merge($db, $userSettings['db']);
+}
 
 $config = [
     'id' => 'basic-console',

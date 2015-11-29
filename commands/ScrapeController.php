@@ -32,7 +32,7 @@ class ScrapeController extends Controller
      */
     public function actionIndex($message = 'scrape')
     {
-        echo $message . " the world \n";
+        echo $message . " the world" . PHP_EOL;
     }
 
     /**
@@ -138,19 +138,21 @@ class ScrapeController extends Controller
         set_time_limit(500);
 
         $time_start = microtime(true);
+        
+        $date = date('m/d/Y h:i:s a', time());
+        echo '[ '. $date . ' ]: ';
 
         $posts = $model->fetchAdData();
 
         $time_end = microtime(true);
 
-        echo "time spent on crawling: " . ( $time_end - $time_start ) . "\n";
+        echo " [ time spent on crawling: " . ( $time_end - $time_start ). ' ] ';
         
         if( !empty( $posts ) ) {
             Post::batchInsert( $posts );  
-
-            echo "data inserted \n";
+            echo "data inserted" . PHP_EOL;
         } else {
-            echo "no need data \n";
+            echo "no action taken" . PHP_EOL;
         }
     }
 

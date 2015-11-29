@@ -34,3 +34,6 @@ temp*.php
 
 # sftp setting
 sftp-config.json
+
+# user setting
+user.settings.php
