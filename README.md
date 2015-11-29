@@ -9,7 +9,7 @@ Build a web service to periodically scrape advertisements from some job searchin
 We can do analytics after collecting enough job posts data over time. for example,   
 *   I want to find out the trend of PHP/Python development positions(so we know the job market better with our first-handed data); 
 *   Send alert to me when positions with certain key words are open;
-*   I want to find out which companies are always hiring the same positions(which most likely means they cannot find/keep the right people and we should avoid them when we want to apply jobs); 
+*   I want to find out repeated ads; 
 
 Or possibly create a anonymous job review service based on the jobs posted. 
 
@@ -21,4 +21,5 @@ I choose the following stacks because I want to practice and be good at them.
 *   how to measure string similarity? `similar_text()` or `levenshtein()` or Cosine similarity or more efficient algorithm?
 *   frontend: bootstrap, jquery, maybe backbone.js
 
-
+##### Current Status of 11/29/15:
+*	console app is deployed to DigitalOcean droplet, It will crawl every hour for the latest ads. 
