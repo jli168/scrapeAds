@@ -80,15 +80,18 @@ abstract class BaseModel extends Component {
 
 		foreach ( $this->generateAdLinks( $adLinks ) as $adlink) {
 			echo "adLink: ".$adlink. PHP_EOL;
-			if( $this->isAdLinkCrawled( $adlink ) && $alreadyFetched < $this->_existedLinkCount ) {
-				echo "this link is already fetched." . PHP_EOL;
-				$alreadyFetched++;
-				continue;
+			if( $this->isAdLinkCrawled( $adlink ) ) {
+				if( $alreadyFetched < $this->_existedLinkCount ) {
+					echo "this link is already fetched." . PHP_EOL;
+					$alreadyFetched++;
+					continue;
+				}
+				if( $alreadyFetched === $this->_existedLinkCount ){
+					echo "this link and the following links are already fetched." . PHP_EOL; 
+					break;
+				}
 			}
-			if( $alreadyFetched === $this->_existedLinkCount ){
-				echo "this link and the following links are already fetched." . PHP_EOL; 
-				break;
-			}
+			
 
 			echo "add it!" . PHP_EOL;
 	        $posts[] = $this->fetchAdContentFromAdLink( $adlink );
