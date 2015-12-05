@@ -16,6 +16,9 @@ use Yii;
  */
 class CLModel extends BaseModel {
 
+	/**
+	 * @var string 
+	 */
 	public $_hostname;
 
 	/**
@@ -34,16 +37,10 @@ class CLModel extends BaseModel {
 	 */
 	public $_location;
 
-	/**
-	 * @var int  Number of ad links to fetch each time
-	 */
-	public $_linkCount;
-
-
 	public function fetchAdData() {
-		$adLinks = $this->fetchAdLinksFromSection();
+		echo "Fetch CL ads. ".PHP_EOL;
 
-		$adLinks = array_slice($adLinks, 0, $this->_linkCount);
+		$adLinks = $this->fetchAdLinksFromSection();
 
 		return $this->fetchAdContentsFromAdLinks( $adLinks );
 	}
@@ -93,5 +90,4 @@ class CLModel extends BaseModel {
 
 		return $data;		
     }
-
 }

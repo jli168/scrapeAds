@@ -95,6 +95,8 @@ class WJModel extends BaseModel {
 	}
 
 	public function fetchAdData() {
+		echo "Fetch WJ feature ads and regualr ads. ".PHP_EOL;
+		
 		$adLinks = $this->fetchAdLinksFromAdCategoryAjaxCall();
 
 		return array_merge( 

@@ -14,11 +14,6 @@ use yii\base\Component;
 abstract class BaseModel extends Component {
 
 	/**
-	 * @var integer  If there are $_existedLinkCount links already fetched, we can stop continuing. 
-	 */
-	public $_existedLinkCount = 2;
-
-	/**
 	 * @var Goutte\Client 	    
 	 */
 	public $_client;
@@ -73,26 +68,16 @@ abstract class BaseModel extends Component {
 	 * @return array array of post data
 	 */
 	public function fetchAdContentsFromAdLinks( $adLinks ) {
-		echo "fetch !!!". PHP_EOL;
 		$posts = array();
-
-		$alreadyFetched = 0;
 
 		foreach ( $this->generateAdLinks( $adLinks ) as $adlink) {
 			echo "adLink: ".$adlink. PHP_EOL;
 
 			if( $this->isAdLinkCrawled( $adlink ) ) {
-				$alreadyFetched++;
 				echo "this link is already fetched." . PHP_EOL;
-				
-				if( $alreadyFetched  >= $this->_existedLinkCount ) {
-					break;
-				}
+				break;
 			} else {
-				// Reset count. Always start counting from last newly added ad
-				$alreadyFetched = 0;
 				echo "add it!" . PHP_EOL;
-				
 		        $posts[] = $this->fetchAdContentFromAdLink( $adlink );
 			}
 		}

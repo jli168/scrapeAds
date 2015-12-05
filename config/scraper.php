@@ -13,7 +13,7 @@ return [
 		'_currentStateId' => 152,
 		'_currentRegionName' => "state_ny",
 		'_wjlang' => "zh-cn",
-		'_pageSize' => 80, // fetch ad counts per ajax call
+		'_pageSize' => 100, // fetch ad counts per ajax call
 	],
 
 	'craigslist' => [
@@ -21,7 +21,6 @@ return [
 		'_hostname' => 'http://newyork.craigslist.org',
 		'_sectionName' => 'software',
 		'_sectionEndpoint' => '/search/sof',
-		'_linkCount' => 20,
 		'_location' => 'new york city',
 	],
 ];
