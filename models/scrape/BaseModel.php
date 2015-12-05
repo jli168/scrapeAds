@@ -17,7 +17,7 @@ abstract class BaseModel extends Component {
 	 * @var integer   If there are $_existedLinkCount links already existed in our database, 
 	 * we think all the following links are already in our database. 
 	 */
-	public $_existedLinkCount = 4;
+	public $_existedLinkCount = 2;
 
 	/**
 	 * @var Goutte\Client 	    
