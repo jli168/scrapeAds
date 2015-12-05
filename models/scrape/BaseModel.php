@@ -14,8 +14,7 @@ use yii\base\Component;
 abstract class BaseModel extends Component {
 
 	/**
-	 * @var integer   If there are $_existedLinkCount links already existed in our database, 
-	 * we think all the following links are already in our database. 
+	 * @var integer  If there are $_existedLinkCount links already fetched, we can stop continuing. 
 	 */
 	public $_existedLinkCount = 2;
 
@@ -74,30 +73,28 @@ abstract class BaseModel extends Component {
 	 * @return array array of post data
 	 */
 	public function fetchAdContentsFromAdLinks( $adLinks ) {
+		echo "fetch !!!". PHP_EOL;
 		$posts = array();
 
 		$alreadyFetched = 0;
 
 		foreach ( $this->generateAdLinks( $adLinks ) as $adlink) {
 			echo "adLink: ".$adlink. PHP_EOL;
+
 			if( $this->isAdLinkCrawled( $adlink ) ) {
-				if( $alreadyFetched < $this->_existedLinkCount ) {
-					echo "this link is already fetched." . PHP_EOL;
-					$alreadyFetched++;
-					continue;
-				}
-				if( $alreadyFetched === $this->_existedLinkCount ){
-					echo "this link and the following links are already fetched." . PHP_EOL; 
+				$alreadyFetched++;
+				echo "this link is already fetched." . PHP_EOL;
+				
+				if( $alreadyFetched  >= $this->_existedLinkCount ) {
 					break;
 				}
+			} else {
+				// Reset count. Always start counting from last newly added ad
+				$alreadyFetched = 0;
+				echo "add it!" . PHP_EOL;
+				
+		        $posts[] = $this->fetchAdContentFromAdLink( $adlink );
 			}
-			
-			echo "add it!" . PHP_EOL;
-			
-			// Reset count. Always start counting from last new ad
-			$alreadyFetched = 0;
-
-	        $posts[] = $this->fetchAdContentFromAdLink( $adlink );
 		}
 		
 		return $posts;

@@ -97,21 +97,22 @@ class WJModel extends BaseModel {
 	public function fetchAdData() {
 		$adLinks = $this->fetchAdLinksFromAdCategoryAjaxCall();
 
-		return $this->fetchAdContentsFromAdLinks( $adLinks );
+		return array_merge( 
+			$this->fetchAdContentsFromAdLinks( $adLinks['featureUrls'] ), 
+			$this->fetchAdContentsFromAdLinks( $adLinks['regularUrls'] )
+		);
 	}
 
-	// Step1: fetch currentCatId's ajax call data, and filter out list of ads
-	
 	/**
 	 * fetchAdLinksFromAdCategoryAjaxCall fetch ad links from current ad category by ajax call
 	 * 
-	 * @return array  Ad itemlinks
+	 * @return multi-dimensional array    Array of featureUrls array and regularUrls array
 	 */
 	public function fetchAdLinksFromAdCategoryAjaxCall() {
 		$queryObject = [
             "keyword" => "",
             "pagesize" => $this->_pageSize, //specify how many rows you want to pull each request
-            "pno" => 0, // only need fetch the first page
+            "pno" => 1, // only need fetch the first page, and pno index start from 1
             "optionVaules" => $this->_optionVaules, 
             "currentURL" => $this->_hostname, 
             "currentCatId" => $this->_currentCatId, 
@@ -120,23 +121,40 @@ class WJModel extends BaseModel {
 
         $crawler = $this->getClient()->request( "POST", $this->_requestUrl,  $queryObject , [], $this->_requestHeader );
 
-        $rowHtml = $crawler->html();
-
-        return $this->fetchAdLinksFromAdCategoryContent( $rowHtml );
+        return $this->fetchAdLinksFromAdCategoryCrawler( $crawler );
 	}
 
 	/**
-	 * fetchAdLinksFromAdCategoryContent fetch the ad links from a html content.
-	 * @param  string   HTML content
-	 * @return array    ad itemlinks
+	 * fetchAdLinksFromAdCategoryCrawler fetch the ad links from the crawler 
+	 * which has the complete content fetched from ajax call.
+	 *
+	 * one charater of wj ad list page is that, it has some feature ads with images always on top,
+	 * so if we split ad list into "feature ads" and "regular ads" and crawl separately, 
+	 * it will be more efficient to decide which ads we've crawled already.
+	 * 
+	 * @param  Symfony\Component\DomCrawler\Crawler   $cralwer
+	 * 
+	 * @return multi-dimensional array    Array of featureUrls array and regularUrls array
 	 */
-	protected function fetchAdLinksFromAdCategoryContent( $rowHtml ) {
-		$crawler = $this->getCrawler();
-        $crawler->addHtmlContent($rowHtml);
-
-		return $crawler->filter(".catDesc a")->each( function( $node, $index ){
-            return $href = $node->attr('href');
+	protected function fetchAdLinksFromAdCategoryCrawler( $crawler ) {
+        // feature urls
+        $featureUrls = $crawler->filter(".catImg a")->each( function( $node, $index ){
+            return $node->attr('href');
         } );
+
+        // all urls
+        $allUrls = $crawler->filter(".catDesc a")->each( function( $node, $index ){
+            return $node->attr('href');
+        } );
+
+		// regular urls are urls that are not feature urls
+		// here, we use array_values to reindex the array, so that it can feeds php generator correctly!
+        $regularUrls = array_values( array_diff( $allUrls, $featureUrls ) );
+
+ 		return array(
+ 			'featureUrls' => $featureUrls,
+ 			'regularUrls' => $regularUrls,
+ 		);
 	}
 
 	/**

@@ -14,9 +14,6 @@ return [
 		'_currentRegionName' => "state_ny",
 		'_wjlang' => "zh-cn",
 		'_pageSize' => 80, // fetch ad counts per ajax call
-		// if there are already _existedLinkCount number of newly crawled ad links existed in our db
-		// we can say all ad links are crawled.
-		'_existedLinkCount' => 10, 
 	],
 
 	'craigslist' => [
