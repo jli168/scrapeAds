@@ -17,7 +17,7 @@ abstract class BaseModel extends Component {
 	 * @var integer   If there are $_existedLinkCount links already existed in our database, 
 	 * we think all the following links are already in our database. 
 	 */
-	public $_existedLinkCount = 2;
+	public $_existedLinkCount = 4;
 
 	/**
 	 * @var Goutte\Client 	    
@@ -92,8 +92,11 @@ abstract class BaseModel extends Component {
 				}
 			}
 			
-
 			echo "add it!" . PHP_EOL;
+			
+			// Reset count. Always start counting from last new ad
+			$alreadyFetched = 0;
+
 	        $posts[] = $this->fetchAdContentFromAdLink( $adlink );
 		}
 		
