@@ -69,7 +69,7 @@ class WJModel extends BaseModel {
 	 * @var integer  Due to wj's unpredictable ad listing order, 
 	 * we only stop crawling when we find $_dupAdCount number of consective already-crawled links.
 	 */
-	public $_dupAdCount = 10;
+	public $_dupAdCount;
 
 	public function init(){
 		parent::init();

@@ -14,6 +14,7 @@ return [
 		'_currentRegionName' => "state_ny",
 		'_wjlang' => "zh-cn",
 		'_pageSize' => 100, // fetch ad counts per ajax call
+		'_dupAdCount' => 10, // set stop crawling limit
 	],
 
 	'craigslist' => [

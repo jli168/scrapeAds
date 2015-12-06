@@ -150,9 +150,9 @@ class ScrapeController extends Controller
         
         if( !empty( $posts ) ) {
             Post::batchInsert( $posts );  
-            echo "data inserted" . PHP_EOL;
+            echo "There are [ ". count($posts). " ] ad inserted" . PHP_EOL;
         } else {
-            echo "no action taken" . PHP_EOL;
+            echo "No action taken" . PHP_EOL;
         }
     }
 
