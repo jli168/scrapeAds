@@ -65,6 +65,12 @@ class WJModel extends BaseModel {
 	 */
 	public $_requestHeader;
 
+	/**
+	 * @var integer  Due to wj's unpredictable ad listing order, 
+	 * we only stop crawling when we find $_dupAdCount number of consective already-crawled links.
+	 */
+	public $_dupAdCount = 10;
+
 	public function init(){
 		parent::init();
 
@@ -102,6 +108,45 @@ class WJModel extends BaseModel {
 			$this->fetchAdContentsFromAdLinks( $adLinks['featureUrls'] ), 
 			$this->fetchAdContentsFromAdLinks( $adLinks['regularUrls'] )
 		);
+	}
+
+	/**
+	 * fetchAdContentsFromAdLinks: fetch all newly found ads and return those ads data in array.
+	 * Due to wj's unpredictable new ad listing order, we only stop crawling when we find 
+	 * $_dupAdCount number of consective already crawled ads.
+	 * 
+	 * @param  array $adLinks 
+	 * 
+	 * @return array array of post data
+	 */
+	public function fetchAdContentsFromAdLinks( $adLinks ) {
+		$posts = array();
+
+		$adCrawled = 0;
+
+		echo PHP_EOL;
+		
+		foreach ( $this->generateAdLinks( $adLinks ) as $adlink) {
+			echo "adLink: ".$adlink. PHP_EOL;
+
+			$post = $this->fetchAdContentFromAdLink ( $adlink );
+
+			if( $this->isAdLinkCrawled( $post['website'] ) ) {
+				echo "this link is already fetched." . PHP_EOL;
+				$adCrawled++;
+
+				if($adCrawled === $this->_dupAdCount){
+					break;
+				}
+			} else {
+				echo "add it!" . PHP_EOL;
+				$adCrawled = 0; // Reset & recount
+
+		        $posts[] = $post;
+			}
+		}
+
+		return $posts;
 	}
 
 	/**
@@ -211,13 +256,5 @@ class WJModel extends BaseModel {
         }
 
         return null;
-    }
-
-    public function isAdLinkCrawled ( $adlink ) {
-    	$adData = $this->fetchAdContentFromAdLink ( $adlink );
-
-    	$website = $adData[ 'website' ];
-
-    	return parent::isAdLinkCrawled( $website );
     }
 }

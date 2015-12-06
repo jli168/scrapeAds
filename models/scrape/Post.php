@@ -40,4 +40,16 @@ class Post extends ActiveRecord {
             $batchInsertArr
         )->execute();
 	}
+
+	/**
+	 * findLatestExistingAdLinks fetch latest 1024 ad links from post table
+	 * 
+	 * @return array  Array of ad links
+	 */
+	public static function findLatestExistingAdLinks(){
+		$sql = "SELECT website FROM post ORDER BY create_at DESC LIMIT 1024";
+		$rawWebsitesData = Post::findBySql($sql)->asArray()->all();
+
+        return array_map(function($data){return $data['website']; }, $rawWebsitesData);
+	}
 }
