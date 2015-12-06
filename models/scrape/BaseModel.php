@@ -14,7 +14,7 @@ use yii\base\Component;
 abstract class BaseModel extends Component {
 
 	/**
-	 * @var Goutte\Client 	    
+	 * @var Goutte\Client
 	 */
 	public $_client;
 
@@ -42,15 +42,15 @@ abstract class BaseModel extends Component {
 	public function init(){
 		parent::init();
 
-        $this->setClient();
+		$this->setClient();
 
-        $this->setCrawler();
-    }
+		$this->setCrawler();
+	}
 
 	/**
 	 * fetchAdData will be overriden by subclasses
 	 * 
-	 * @return array   Ad data
+	 * @return array array of post data
 	 */
 	abstract public function fetchAdData();
 	
@@ -99,7 +99,6 @@ abstract class BaseModel extends Component {
 		}
 	}
 
-
 	/**
 	 * isAdLinkCrawled return true if $adlink is already in Post database table's 'website' column. 
 	 * it can be overriden if subclass does not store adlink there.
@@ -114,5 +113,4 @@ abstract class BaseModel extends Component {
 
 		return $ad !== null;
 	}
-
 }

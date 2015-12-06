@@ -71,7 +71,6 @@ class WJModel extends BaseModel {
 		/**
 		 *  The following settings are copied from worldjournal ajax request
 		 */
-
 		$this->_requestUrl = $this->_hostname
 			. "/wp-content/themes/wjlife/includes/classified-core.php"
 			. "?regions=". $this->_currentRegionName
@@ -89,8 +88,8 @@ class WJModel extends BaseModel {
 		];
 
         $this->_requestHeader = [
-            'HTTP_X-Requested-With' => 'XMLHttpRequest',
-            'contentType' => 'application/x-www-form-urlencoded;charset=utf-8',
+			'HTTP_X-Requested-With' => 'XMLHttpRequest',
+			'contentType' => 'application/x-www-form-urlencoded;charset=utf-8',
         ];
 	}
 
