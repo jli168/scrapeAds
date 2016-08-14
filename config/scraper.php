@@ -8,6 +8,7 @@ return [
 	'worldjournal' => [
 		'class' => 'app\models\scrape\WJModel',
 		'_hostname' => 'http://www.wjlife.com',
+		'_endpoint' => '/wp-content/themes/wjlife/includes/classified-core-new.php',
 		'_currentCatId' => 327, //restaurant help, hardcoded in their js code
 		'_currentCatName' => 'restaurant help',
 		'_currentStateId' => 152,

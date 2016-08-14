@@ -26,6 +26,11 @@ class WJModel extends BaseModel {
 	public $_requestUrl;
 
 	/**
+	 * @var string Endpoint
+	 */
+	public $_endpoint;
+
+	/**
 	 * @var string 	language   
 	 */	
 	public $_wjlang;
@@ -78,10 +83,12 @@ class WJModel extends BaseModel {
 		 *  The following settings are copied from worldjournal ajax request
 		 */
 		$this->_requestUrl = $this->_hostname
-			. "/wp-content/themes/wjlife/includes/classified-core.php"
+			. $this->_endpoint
 			. "?regions=". $this->_currentRegionName
 			. "&variant=". $this->_wjlang
 			. "&t=" . time();
+
+		var_dump( "request Url is ". $this->_requestUrl );
 
 		$this->_optionVaules = [
 			"relation" => "AND",
@@ -104,8 +111,8 @@ class WJModel extends BaseModel {
 		
 		$adLinks = $this->fetchAdLinksFromAdCategoryAjaxCall();
 
-		return array_merge( 
-			$this->fetchAdContentsFromAdLinks( $adLinks['featureUrls'] ), 
+		return array_merge(
+			$this->fetchAdContentsFromAdLinks( $adLinks['featureUrls'] ),
 			$this->fetchAdContentsFromAdLinks( $adLinks['regularUrls'] )
 		);
 	}
@@ -125,7 +132,7 @@ class WJModel extends BaseModel {
 		$adCrawled = 0;
 
 		echo PHP_EOL;
-		
+
 		foreach ( $this->generateAdLinks( $adLinks ) as $adlink) {
 			echo "adLink: ".$adlink. PHP_EOL;
 
@@ -183,56 +190,46 @@ class WJModel extends BaseModel {
 	 * @return multi-dimensional array    Array of featureUrls array and regularUrls array
 	 */
 	protected function fetchAdLinksFromAdCategoryCrawler( $crawler ) {
-        // feature urls
-        $featureUrls = $crawler->filter(".catImg a")->each( function( $node, $index ){
-            return $node->attr('href');
+		$urls = array(
+			"featureUrls" => array(),
+			"regularUrls" => array(),
+		);
+
+		$crawler->filter(".product .frame a")->each( function( $node, $index ) use ( &$urls ){
+			$href = $this->normalizeUrl( $node->attr( 'href' ) );
+
+        	if ( count( $node->filter( ".image" ) ) ) {
+        		$urls[ "featureUrls" ][] = $href;
+        	} else {
+        		$urls[ "regularUrls" ][] = $href;
+        	}
         } );
 
-        // all urls
-        $allUrls = $crawler->filter(".catDesc a")->each( function( $node, $index ){
-            return $node->attr('href');
-        } );
-
-		// regular urls are urls that are not feature urls
-		// here, we use array_values to reindex the array, so that it can feeds php generator correctly!
-        $regularUrls = array_values( array_diff( $allUrls, $featureUrls ) );
-
- 		return array(
- 			'featureUrls' => $featureUrls,
- 			'regularUrls' => $regularUrls,
- 		);
+		return $urls;
 	}
 
 	/**
 	 * fetchAdContentFromAdLink crawl link data and save ad data to post array
-	 * @param  string $adlink 
+	 * @param  string $adlink
 	 * @return array  post data
 	 */
 	public function fetchAdContentFromAdLink( $adlink ) {
-		// add languague preference to link
-		$adlink = $adlink . "?variant=" . $this->_wjlang;
-
 		$crawler = $this->getClient()->request( 'GET', $adlink );
 
 		$post = array();
 
 		// get title:
-		$title = $crawler->filter(".classifiedTitle h4")->text();
-		$post['title'] = trim( $title );
+		$post['title'] = trim( utf8_decode( $crawler->filter(".title")->text() ) );
 
-		// get website:
-		$shortUrl = $crawler->filter("#qr_code")->attr("data-url");
-		$post[ 'website' ] = $shortUrl;
-
-		$rawContent = $crawler->filter(".classifiedDetails")->text();
-		$contentArr = explode( "\n", trim( $rawContent ) );
-
-		// get location:
-		$location = $this->findAdLocation( $contentArr[ 0 ] );
-		$post[ 'location' ] = $location;
+		// get phone number as location:
+		$infoLink = $crawler->filter( ".infolink");
+		$post[ "location" ] = count( $infoLink ) ? $infoLink->attr( "href" ) : "";
 
 		// get content:
-		$post[ 'content' ] = trim( $contentArr[ 1 ] );
+		$post[ "content" ] = utf8_decode( $crawler->filter(".details-holder .text")->text() );
+
+		// get website:
+        $post[ 'website' ] = $this->_hostname.$adlink;
 
 		// get section:
         $post[ 'section' ] = $this->_currentCatName;
@@ -240,21 +237,8 @@ class WJModel extends BaseModel {
 		return $post;
 	}
 
-	/**
-	 * findAdLocation uses pattern to mach string like "地区: 纽约上州 / Upstate NY",
-	 * and return location string "纽约上州 / Upstate NY"
-	 * 
-	 * @param  string $content 
-	 * @return string          location string
-	 */
-    protected function findAdLocation( $content ) {
-    	
-        $pattern = "/\:(.+)/"; 
-
-        if( preg_match($pattern, $content, $matches) ) {
-            return trim( $matches[ 1 ] );
-        }
-
-        return null;
-    }
+	// fix wjlife bug of unable to change variant
+	protected function normalizeUrl( $href ) {
+		return str_replace( "zh-tw", $this->_wjlang, $href);
+	}
 }
