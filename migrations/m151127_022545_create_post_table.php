@@ -24,7 +24,7 @@ class m151127_022545_create_post_table extends Migration
             'id' => $this->primaryKey(),
             'title' => $this->string(52)->notNull(),
             'content' => $this->text(),
-            'website' => $this->string(100),
+            'website' => $this->string(168),
             'section' => $this->string(52),
             'location' => $this->string(52),
             'create_at' => $this->timestamp()->notNull(),
