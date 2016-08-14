@@ -48,8 +48,19 @@ class Post extends ActiveRecord {
 	 */
 	public static function findLatestExistingAdLinks(){
 		$sql = "SELECT website FROM post ORDER BY create_at DESC LIMIT 1024";
-		$rawWebsitesData = Post::findBySql($sql)->asArray()->all();
+		$rawWebsitesData = static::findBySql($sql)->asArray()->all();
 
         return array_map(function($data){return $data['website']; }, $rawWebsitesData);
+	}
+
+	// test: dump latest restaurant help posts
+	public function showWJads() {
+		$posts = static::find()
+				->where(['section' => 'restaurant help'])
+				->asArray()
+				->orderBy("create_at DESC")
+				->limit(10)
+				->all();
+		return $posts;
 	}
 }

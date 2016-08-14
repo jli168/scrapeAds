@@ -104,7 +104,7 @@ abstract class BaseModel extends Component {
 	 * it can be overriden if subclass does not store adlink there.
 	 *
 	 * @param  string  $adlink  
-	 * @return boolean         
+	 * @return boolean
 	 */
 	public function isAdLinkCrawled( $adlink ) {
 		$ad = Post::findOne( [

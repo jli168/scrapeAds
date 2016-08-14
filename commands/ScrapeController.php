@@ -84,9 +84,9 @@ class ScrapeController extends Controller
                     "key" => "wj_order_id"
                 ]
             ]
-        ];     
+        ];
         //all help wanted
-        $currentURL="/cls_category/03-ny-help-wanted/";      
+        $currentURL="/cls_category/03-ny-help-wanted/";
 
         //temp page number
         $pno = 0;
@@ -149,7 +149,7 @@ class ScrapeController extends Controller
         echo " [ time spent on crawling: " . ( $time_end - $time_start ). ' ] ';
         
         if( !empty( $posts ) ) {
-            Post::batchInsert( $posts );  
+            Post::batchInsert( $posts );
             echo "There are [ ". count($posts). " ] ad inserted" . PHP_EOL;
         } else {
             echo "No action taken" . PHP_EOL;
